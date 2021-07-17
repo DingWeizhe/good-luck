@@ -90,3 +90,22 @@ mat-progress-bar {
   font-size: 0.8em;
   margin-top: 12px;
 }
+
+.other-award {
+  padding-right: 8px;
+}
+
+.background {
+  position: fixed;
+  z-index: -1;
+  height: 100%;
+  width: 100%;
+  .hint {
+    position: absolute;
+    width: 100%;
+    font-size: 2em;
+    line-height: 3em;
+    color: #f3f3f3;
+    user-select: none;
+  }
+}

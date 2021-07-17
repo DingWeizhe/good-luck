@@ -1,15 +1,25 @@
+<div class="background">
+  <div
+    class="hint"
+    *ngFor="let hint of hints"
+    [style.left.%]="hint.left"
+    [style.top.%]="hint.top"
+  >
+    {{ hint.text }}
+  </div>
+</div>
 <div class="step">
   <div class="wrap">
-    <h1>嗨！這裡可以幫助您計算抽卡到底多少錢？</h1>
+    <h1>嗨！這裡可以幫助破解抽卡迷思!!</h1>
     <button mat-raised-button (click)="next(1)" color="primary">
-      開始計算
+      開始破解
     </button>
   </div>
 </div>
 
 <div *ngIf="step >= 1" class="step">
   <div class="wrap">
-    <h1>第一步，先輸入抽卡所需要的錢錢吧！</h1>
+    <h1>第一步，先輸入抽卡所需要的費用吧！</h1>
 
     <div class="form">
       每單
@@ -82,9 +92,10 @@
         </button>
       </div>
 
-      <div class="award" *ngIf="!sameProbability && remainingProbability > 0">
-        <mat-checkbox value="true" disabled> </mat-checkbox>
-
+      <div
+        class="award other-award"
+        *ngIf="!sameProbability && remainingProbability > 0"
+      >
         <mat-form-field floatLabel="always">
           <mat-label>名稱</mat-label>
           <input matInput disabled value="其他" type="text" />
@@ -139,9 +150,8 @@
       <ngx-charts-line-chart
         [view]="view"
         [scheme]="{ domain: ['#4051b5'] }"
-        [gradient]="false"
-        [legend]="false"
-        [animations]="false"
+        [gradient]="true"
+        [animations]="true"
         [showXAxisLabel]="true"
         [showYAxisLabel]="true"
         [xAxis]="true"
@@ -149,7 +159,6 @@
         xAxisLabel="抽卡次數"
         yAxisLabel="中獎率"
         [results]="results"
-        [timeline]="true"
       >
         <ng-template #tooltipTemplate let-model="model">
           {{ model.name }} 抽時圓滿達成的機率 {{ model.value }}%
@@ -169,7 +178,8 @@
       >
       </mat-progress-bar>
       <div class="status">
-        {{ needCount }} 抽，花費 {{ needCost | number: "0.0-0" }}，圓滿機率
+        {{ currentCount }} 抽，花費
+        {{ currentCost | number: "0.0-0" }}，圓滿機率
         {{ currentAchievementProbability * 100 | number: "0.2-2" }} %
       </div>
     </ng-container>

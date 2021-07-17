@@ -12,6 +12,29 @@ type Award = {
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
+  public hints = [
+    {
+      text: '1% 的轉蛋抽個 100 次，還是有4成的人抽不到？？？',
+      left: 20,
+      top: 0,
+    },
+    {
+      text: '手遊抽 2,500 次沒中虛寶，是運氣不好還是機率造假？',
+      left: 30,
+      top: 10,
+    },
+    { text: '一抽入魂', left: 80, top: 32 },
+    { text: '機率到底怎麼算？', left: 41, top: 24 },
+    { text: '又是 R 卡啊啊啊啊啊啊～～', left: 23, top: 80 },
+    { text: '我到底還要不要抽下去？', left: 82, top: 20 },
+    { text: '不！我破產了', left: 80, top: 80 },
+    { text: '回本啦！', left: 12, top: 85 },
+    { text: '人品爆發', left: 90, top: 50 },
+    { text: '不氪個萬把塊，怎麼好意思抱怨抽不到角色？', left: 10, top: 60 },
+    { text: '我始終相信我的牌組！！', left: -3, top: 20 },
+    { text: '卡片是有靈魂的', left: 14, top: 35 },
+    { text: '好好地感受神的憤怒吧!', left: 60, top: 70 },
+  ];
   public fakeNames = [
     '妙蛙種子',
     '妙蛙草',
@@ -176,9 +199,9 @@ export class AppComponent implements OnInit {
 
   public remainingProbability = 100;
 
-  public needCost = 0;
+  public currentCost = 0;
 
-  public needCount = 0;
+  public currentCount = 0;
 
   public currentAchievementProbability = 0;
 
@@ -243,6 +266,7 @@ export class AppComponent implements OnInit {
       probability: 1,
       goal: false,
     });
+    this.onProbabilityChanged();
   }
 
   public addAward() {
@@ -257,11 +281,12 @@ export class AppComponent implements OnInit {
     const index = this.awards.indexOf(award);
     if (index === -1) return;
     this.awards.splice(index, 1);
+    this.onProbabilityChanged();
   }
 
-  public averageProbability() {
-    const probability = 100 / this.awards.length;
-    this.awards.map((award) => (award.probability = probability));
+  public averageProbability(awards: Award[]) {
+    const probability = 100 / awards.length;
+    awards.map((award) => (award.probability = probability));
   }
 
   public onProbabilityChanged() {
@@ -288,8 +313,8 @@ export class AppComponent implements OnInit {
   public async calculate() {
     this.targetAchievementProbability = 0.8;
     this.currentAchievementProbability = 0;
-    this.needCost = 0;
-    this.needCount = 0;
+    this.currentCost = 0;
+    this.currentCount = 0;
 
     this.view = [
       document.body.clientWidth * 0.8,
@@ -308,10 +333,10 @@ export class AppComponent implements OnInit {
     ];
     let next: Event[] = [];
 
-    const awards = [...this.awards];
+    const awards = [...this.awards.map((award) => ({ ...award }))];
 
     if (this.sameProbability) {
-      this.averageProbability();
+      this.averageProbability(awards);
     } else {
       this.onProbabilityChanged();
       awards.push({
@@ -332,8 +357,8 @@ export class AppComponent implements OnInit {
 
     while (true) {
       await this.delay(10);
-      this.needCost += this.cost;
-      this.needCount += this.quantity;
+      this.currentCost += this.cost;
+      this.currentCount += this.quantity;
 
       for (let i = 0; i < this.quantity; i++) {
         await this.calculateNextEvent(current, awards, next);
@@ -347,15 +372,15 @@ export class AppComponent implements OnInit {
         .reduce((prev, event) => prev + event.probability, 0);
 
       this.series.push({
-        name: this.needCount.toString(),
+        name: this.currentCount.toString(),
         value: parseFloat(
           (this.currentAchievementProbability * 100).toFixed(2)
         ),
       });
 
       if (this.currentAchievementProbability >= this.table[row].threshold) {
-        this.table[row].cost = this.needCost;
-        this.table[row].count = this.needCount;
+        this.table[row].cost = this.currentCost;
+        this.table[row].count = this.currentCount;
         this.table[row].probability = this.currentAchievementProbability;
         row++;
       }
